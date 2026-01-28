@@ -1,0 +1,59 @@
+{
+  "defaults": {
+    "port": 22,
+    "default_timeout_sec": 30,
+    "max_timeout_sec": 120,
+    "max_output_chars": 20000,
+    "allow_any_command": false,
+    "subcommand_prefix_programs": [
+      "git"
+    ],
+    "allowed_prefixes": [
+      "ls ",
+      "cat ",
+      "pwd",
+      "whoami",
+      "df ",
+      "uname "
+    ],
+    "deny_regexes": [
+      "\\brm\\b",
+      "\\bshutdown\\b",
+      "\\breboot\\b"
+    ]
+  },
+  "hosts": {
+    "prod": {
+      "description": "Production host (read-only commands)",
+      "host": "example.com",
+      "username": "ubuntu",
+      "auth": {
+        "type": "key",
+        "private_key_path_env": "PROD_SSH_KEY_PATH",
+        "passphrase_env": "PROD_SSH_KEY_PASSPHRASE"
+      },
+      "allowed_commands": [
+        "systemctl status nginx",
+        "systemctl status docker"
+      ],
+      "allowed_prefixes": [
+        "journalctl -u nginx",
+        "tail -n 200 /var/log/"
+      ]
+    },
+    "dev-password": {
+      "description": "Password auth example (use env var)",
+      "host": "dev.example.com",
+      "username": "devuser",
+      "auth": {
+        "type": "password",
+        "password_env": "DEV_SSH_PASSWORD"
+      },
+      "allowed_prefixes": [
+        "ls ",
+        "cat ",
+        "pwd"
+      ]
+    }
+  }
+}
