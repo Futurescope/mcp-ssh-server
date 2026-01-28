@@ -5,6 +5,7 @@ import json
 import os
 import re
 import shlex
+import sys
 import time
 import uuid
 from typing import Any, Dict, Optional
@@ -23,12 +24,38 @@ _pending_approvals: Dict[str, Dict[str, Any]] = {}
 _pending_ttl_sec = 300
 
 
+# Helps PyInstaller bundle win32timezone on Windows.
+if sys.platform.startswith("win"):
+    try:
+        import win32timezone  # noqa: F401
+    except Exception:
+        pass
+
+
+def _resolve_config_path(path: str) -> str:
+    if os.path.isabs(path):
+        return path
+    cwd_candidate = os.path.abspath(path)
+    if os.path.isfile(cwd_candidate):
+        return cwd_candidate
+    if getattr(sys, "frozen", False):
+        exe_dir = os.path.dirname(sys.executable)
+        exe_candidate = os.path.join(exe_dir, path)
+        if os.path.isfile(exe_candidate):
+            return exe_candidate
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    file_candidate = os.path.join(file_dir, path)
+    if os.path.isfile(file_candidate):
+        return file_candidate
+    return cwd_candidate
+
+
 def _load_config() -> Dict[str, Any]:
     global _config_cache
     if _config_cache is not None:
         return _config_cache
 
-    path = os.getenv(CONFIG_ENV, DEFAULT_CONFIG_PATH)
+    path = _resolve_config_path(os.getenv(CONFIG_ENV, DEFAULT_CONFIG_PATH))
     if not os.path.isfile(path):
         raise FileNotFoundError(
             f"Config file not found: {path}. Set {CONFIG_ENV} or create {DEFAULT_CONFIG_PATH}."
