@@ -5,7 +5,8 @@ description = "MCP server that runs remote commands over SSH."
 requires-python = ">=3.10"
 dependencies = [
   "mcp>=1.0.0",
-  "asyncssh>=2.14.0"
+  "asyncssh>=2.14.0",
+  "pywin32>=306; platform_system == \"Windows\""
 ]
 
 [project.scripts]
