@@ -28,6 +28,7 @@ jobs:
           python -m PyInstaller -F --name mcp-ssh-server mcp_ssh_server.py
 
       - name: Package zip
+        shell: bash
         run: |
           python - <<'PY'
           import os, zipfile, shutil, platform
